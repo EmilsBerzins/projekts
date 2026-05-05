@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request, redirect
 import sqlite3
 from pathlib import Path
+import uuid
+import os
 
 app = Flask(__name__)
 
@@ -17,12 +19,36 @@ def index():
     return render_template("index.html")
 
 
-@app.route("/pilsetas")
+@app.route("/pilsetas", methods=["GET", "POST"])
 def pilsetas():
     conn = get_db_connection()
+    if request.method == "POST":
+        cursor = conn.cursor()
+        cursor.execute(
+            "INSERT INTO statistika (iedzivotaji, platiba) VALUES (?, ?)",
+            (
+                request.form["iedzivotaji"],
+                request.form["platiba"],
+            ),
+        )
+        statistika_id = cursor.lastrowid
+        cursor.execute(
+            "INSERT INTO pilsetas (nosaukums, statistika_id) VALUES (?, ?)",
+            (
+                request.form["nosaukums"],
+                statistika_id,
+            ),
+        )
+        conn.commit()
+
     pilsetas = conn.execute("SELECT * FROM pilsetas").fetchall()
     conn.close()
     return render_template("pilsetas_index.html", pilsetas=pilsetas)
+
+
+@app.route("/pilsetas/create")
+def pievienot_pilsetu():
+    return render_template("pilsetas_create.html")
 
 
 @app.route("/pilsetas/<int:id>")
@@ -36,6 +62,38 @@ def pilseta(id):
     return render_template("pilsetas_show.html", pilseta=pilseta)
 
 
+@app.route("/pilsetas/<int:id>/dzest")
+def dzest_pilsetu(id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    pilseta = cursor.execute(
+        "SELECT * FROM pilsetas WHERE id = ?",
+        (id,),
+    ).fetchone()
+    cursor.execute(
+        "DELETE FROM pilsetas WHERE id = ?",
+        (id,),
+    )
+    cursor.execute(
+        "DELETE FROM statistika WHERE id = ?",
+        (pilseta["statistika_id"],),
+    )
+    fotos = cursor.execute(
+        "SELECT foto_url FROM apskates_objekti WHERE pilsetas_id = ?",
+        (id,),
+    ).fetchall()
+    cursor.execute(
+        "DELETE FROM apskates_objekti WHERE pilsetas_id = ?",
+        (id,),
+    )
+    conn.commit()
+    for foto in fotos:
+        path = Path(__file__).parent / "static" / "images" / "objekti" / foto[0]
+        os.remove(path)
+
+    return redirect("/pilsetas")
+
+
 @app.route("/pilsetas/<int:id>/objekti", methods=["GET", "POST"])
 def apskates_objekti(id):
     if request.method == "POST":
@@ -45,16 +103,15 @@ def apskates_objekti(id):
         if file.filename == "":
             return redirect(request.url)
         if file and file.filename:
-            path = (
-                Path(__file__).parent / "static" / "images" / "objekti" / file.filename
-            )
+            filename = str(uuid.uuid4()) + ".jpg"
+            path = Path(__file__).parent / "static" / "images" / "objekti" / filename
             file.save(path)
             conn = get_db_connection()
             cursor = conn.cursor()
             cursor.execute(
                 "INSERT INTO apskates_objekti (foto_url, pilsetas_id) VALUES (?, ?)",
                 (
-                    file.filename,
+                    filename,
                     id,
                 ),
             )

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Pilsētas{% endblock %}
+{% block content %}
+  <h1>Pievienot Pilsētu</h1>
+  <form method=post action="/pilsetas">
+    <label for="nosaukums">Nosaukums: </label>
+    <input type="text" name="nosaukums">
+    <label for="iedzivotaji">Iedzīvotāju skaits: </label>
+    <input type="number" name="iedzivotaji">
+    <label for="platiba">Platība: </label>
+    <input type="number" name="platiba">
+    <input type="submit" value="Pievienot">
+  </form>
+{% endblock %}
