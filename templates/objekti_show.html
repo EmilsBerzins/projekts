@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Pilsētas{% endblock %}
+{% block content %}
+  <h1>Apskates Objekti</h1>
+  <div>
+    {% for objekts in objekti %}
+      <img src="{{ url_for('static', filename='images/objekti/' + objekts['foto_url'])}}" alt="">
+    {% endfor %}
+  <a href="/pilsetas/{{id}}/objekti/add">Pievienot objektu</a>
+  </div>
+{% endblock %}

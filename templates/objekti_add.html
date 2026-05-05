@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Pilsētas{% endblock %}
+{% block content %}
+  <h1>Apskates Objekti</h1>
+<form action="/pilsetas/{{id}}/objekti" method=post enctype=multipart/form-data>
+    <input type="file" name="file">
+    <input type="submit" value="Upload">
+  </form>
+{% endblock %}

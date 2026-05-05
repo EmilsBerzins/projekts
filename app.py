@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request, redirect
 import sqlite3
 from pathlib import Path
 
@@ -34,3 +34,41 @@ def pilseta(id):
     ).fetchone()
     conn.close()
     return render_template("pilsetas_show.html", pilseta=pilseta)
+
+
+@app.route("/pilsetas/<int:id>/objekti", methods=["GET", "POST"])
+def apskates_objekti(id):
+    if request.method == "POST":
+        if "file" not in request.files:
+            return redirect(request.url)
+        file = request.files["file"]
+        if file.filename == "":
+            return redirect(request.url)
+        if file and file.filename:
+            path = (
+                Path(__file__).parent / "static" / "images" / "objekti" / file.filename
+            )
+            file.save(path)
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute(
+                "INSERT INTO apskates_objekti (foto_url, pilsetas_id) VALUES (?, ?)",
+                (
+                    file.filename,
+                    id,
+                ),
+            )
+            conn.commit()
+
+    conn = get_db_connection()
+    objekti = conn.execute(
+        "SELECT * FROM apskates_objekti WHERE pilsetas_id = ?",
+        (id,),
+    ).fetchall()
+    conn.close()
+    return render_template("objekti_show.html", objekti=objekti, id=id)
+
+
+@app.route("/pilsetas/<int:id>/objekti/add")
+def pievienot_objektu(id):
+    return render_template("objekti_add.html", id=id)
