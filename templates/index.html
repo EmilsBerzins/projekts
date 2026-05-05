@@ -1,12 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Pilsētas{% endblock %}
+{% block title %}Latvijas Pilsētas{% endblock %}
 {% block content %}
-  <h1>Pilsētas</h1>
-  <div>
-    {% for pilseta in pilsetas %}
-        <a href="/{{pilseta['id']}}">
-            <p>{{pilseta["nosaukums"]}}</p>
-        </a>
-    {% endfor %}
-  </div>
+  <h1>Latvijas Pilsētas</h1>
 {% endblock %}

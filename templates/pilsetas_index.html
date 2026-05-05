@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Pilsētas{% endblock %}
+{% block content %}
+  <h1>Pilsētas</h1>
+  <div>
+    {% for pilseta in pilsetas %}
+        <a href="/pilsetas/{{pilseta['id']}}">
+            <p>{{pilseta["nosaukums"]}}</p>
+        </a>
+    {% endfor %}
+  </div>
+{% endblock %}

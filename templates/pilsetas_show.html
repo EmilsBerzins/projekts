@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}{{pilseta["name"]}}{% endblock %}
+{% block content %}
+  <h1>Pilsētas</h1>
+  <div>
+    <p>id: {{pilseta["id"]}}</p>
+    <p>nosaukums: {{pilseta["nosaukums"]}}</p>
+    <p>iedzivotaji: {{pilseta["iedzivotaji"]}}</p>
+    <p>platiba: {{pilseta["platiba"]}}</p>
+  </div>
+{% endblock %}
