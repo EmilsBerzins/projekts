@@ -159,5 +159,63 @@ def apskates_objekti(id):
 def pievienot_objektu(id):
     return render_template("objekti_add.html", id=id)
 
+@app.route("/komentari", methods=["GET", "POST"])
+def komentari():
+    conn = get_db_connection()
+    
+    if request.method == "POST":
+        autors = request.form.get("autors", "Anonīms").strip() or "Anonīms"
+        teksts = request.form.get("teksts", "").strip()
+        kategorija = request.form.get("kategorija", "vispareji")
+        pilseta = request.form.get("pilseta", "").strip()
+        
+        if teksts:
+            from datetime import datetime
+            conn.execute(
+                "INSERT INTO komentari (autors, teksts, kategorija, pilseta, datums) VALUES (?, ?, ?, ?, ?)",
+                (autors, teksts, kategorija, pilseta, datetime.now().strftime("%Y-%m-%d %H:%M"))
+            )
+            conn.commit()
+    
+    kategorija_filter = request.args.get("kategorija", "visi")
+    
+    if kategorija_filter == "visi":
+        komentari = conn.execute(
+            "SELECT * FROM komentari ORDER BY id DESC"
+        ).fetchall()
+    else:
+        komentari = conn.execute(
+            "SELECT * FROM komentari WHERE kategorija = ? ORDER BY id DESC",
+            (kategorija_filter,)
+        ).fetchall()
+    
+    pilsetas = conn.execute("SELECT nosaukums FROM pilsetas ORDER BY nosaukums").fetchall()
+    conn.close()
+    return render_template("komentari.html", komentari=komentari, pilsetas=pilsetas, aktiva_kategorija=kategorija_filter)
+ 
+ 
+@app.route("/komentari/<int:id>/dzest")
+def dzest_komentaru(id):
+    conn = get_db_connection()
+    conn.execute("DELETE FROM komentari WHERE id = ?", (id,))
+    conn.commit()
+    conn.close()
+    return redirect("/komentari")
+
+@app.route("/pilsetas/<int:pilsetas_id>/objekti/<int:objekta_id>/dzest")
+def dzest_objektu(pilsetas_id, objekta_id):
+    conn = get_db_connection()
+    objekts = conn.execute(
+        "SELECT foto_url FROM apskates_objekti WHERE id = ?",
+        (objekta_id,)
+    ).fetchone()
+    conn.execute("DELETE FROM apskates_objekti WHERE id = ?", (objekta_id,))
+    conn.commit()
+    conn.close()
+    path = Path(__file__).parent / "static" / "images" / "objekti" / objekts["foto_url"]
+    if path.exists():
+        os.remove(path)
+    return redirect(f"/pilsetas/{pilsetas_id}/objekti")
+
 if __name__ == "__main__":
     app.run(debug=True)

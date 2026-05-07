@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block title %}Komentari un Ieteikumi{% endblock %}
+{% block content %}
+
+<div class="komentari-page">
+  <div class="page-header">
+    <h1>Komentari un Ieteikumi</h1>
+    <p class="page-subtitle">Dalies ar saviem ieteikumiem par Latvijas pilsētām — kādus objektus apmeklēt, ko pievienot mājaslapai un vēl!</p>
+  </div>
+
+  <div class="comment-form-section">
+    <h2>Raksti komentāru</h2>
+    <form method="POST" action="/komentari" class="comment-form">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="autors">Tavs vārds (neobligāti)</label>
+          <input type="text" id="autors" name="autors" placeholder="Anonims ceļotājs" maxlength="50">
+        </div>
+        <div class="form-group">
+          <label for="kategorija">Komentara veids</label>
+          <select id="kategorija" name="kategorija" required>
+            <option value="ieteikums">Apskates objekta ieteikums</option>
+            <option value="pilseta">Par kādu pilsētu</option>
+            <option value="majaslapa">Ko pievienot mājaslapai</option>
+            <option value="vispareji">Vispārīgs komentārs</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="pilseta">Pilsēta (neobligāti)</label>
+        <select id="pilseta" name="pilseta">
+          <option value="">— Nav norādīta —</option>
+          {% for p in pilsetas %}
+            <option value="{{ p['nosaukums'] }}">{{ p['nosaukums'] }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="teksts">Komentārs</label>
+        <textarea id="teksts" name="teksts" placeholder="Piemēram: Iesaku apmeklēt Rīgas vecpilsētu — tur ir brīnišķīga arhitektūra!" required maxlength="1000"></textarea>
+        <span class="char-count"><span id="char-num">0</span> / 1000</span>
+      </div>
+
+      <button type="submit" class="btn btn-primary">Nosūtīt komentāru</button>
+    </form>
+  </div>
+
+  <div class="filter-section">
+    <h2>Visi komentari</h2>
+    <div class="filter-tabs">
+      <a href="/komentari?kategorija=visi" class="filter-tab {% if aktiva_kategorija == 'visi' %}active{% endif %}">Visi</a>
+      <a href="/komentari?kategorija=ieteikums" class="filter-tab {% if aktiva_kategorija == 'ieteikums' %}active{% endif %}">Ieteikumi</a>
+      <a href="/komentari?kategorija=pilseta" class="filter-tab {% if aktiva_kategorija == 'pilseta' %}active{% endif %}">Par pilsētu</a>
+      <a href="/komentari?kategorija=majaslapa" class="filter-tab {% if aktiva_kategorija == 'majaslapa' %}active{% endif %}">Mājaslapa</a>
+      <a href="/komentari?kategorija=vispareji" class="filter-tab {% if aktiva_kategorija == 'vispareji' %}active{% endif %}">Vispārīgi</a>
+    </div>
+  </div>
+
+  <div class="comments-list">
+    {% if komentari %}
+      {% for k in komentari %}
+      <div class="comment-card kategorija-{{ k['kategorija'] }}">
+        <div class="comment-header">
+          <div class="comment-meta">
+            <span class="comment-author">{{ k['autors'] }}</span>
+            {% if k['pilseta'] %}
+              <span class="comment-city">{{ k['pilseta'] }}</span>
+            {% endif %}
+            <span class="comment-badge badge-{{ k['kategorija'] }}">
+              {% if k['kategorija'] == 'ieteikums' %}Ieteikums
+              {% elif k['kategorija'] == 'pilseta' %}Par pilsētu
+              {% elif k['kategorija'] == 'majaslapa' %}Mājaslapa
+              {% else %}Vispārīgi{% endif %}
+            </span>
+          </div>
+          <div class="comment-actions">
+            <span class="comment-date">{{ k['datums'] }}</span>
+            <a href="/komentari/{{ k['id'] }}/dzest" class="btn btn-danger btn-small" onclick="return confirm('Vai tiešām dzēst šo komentāru?')">Dzest</a>
+          </div>
+        </div>
+        <div class="comment-body">
+          <p>{{ k['teksts'] }}</p>
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="empty-state">
+        <h3>Vēl nav komentāru</h3>
+        <p>Esi pirmais, kurš dalās ar savu ieteikumu!</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+  const teksts = document.getElementById('teksts');
+  const charNum = document.getElementById('char-num');
+  teksts.addEventListener('input', () => {
+    charNum.textContent = teksts.value.length;
+  });
+</script>
+
+{% endblock %}
