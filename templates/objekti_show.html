@@ -1,11 +1,16 @@
 {% extends "base.html" %}
-{% block title %}Pilsētas{% endblock %}
+{% block title %}Apskates objekti{% endblock %}
 {% block content %}
-  <h1>Apskates Objekti</h1>
-  <div>
+  <h1>Apskates objekti</h1>
+  <div class="mb-4">
+    <a href="/pilsetas/{{id}}/objekti/add" class="btn btn-primary">Pievienot objektu</a>
+    <a href="/pilsetas" class="btn">Atpakaļ uz pilsētām</a>
+  </div>
+  <div class="grid">
     {% for objekts in objekti %}
-      <img src="{{ url_for('static', filename='images/objekti/' + objekts['foto_url'])}}" alt="">
+      <div class="card">
+        <img src="{{ url_for('static', filename='images/objekti/' + objekts['foto_url'])}}" alt="Apskates objekts" style="width: 100%; height: 250px; object-fit: cover; border-radius: 0.375rem; margin-bottom: 1rem;">
+      </div>
     {% endfor %}
-  <a href="/pilsetas/{{id}}/objekti/add">Pievienot objektu</a>
   </div>
 {% endblock %}

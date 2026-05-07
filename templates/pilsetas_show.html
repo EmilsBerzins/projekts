@@ -1,13 +1,16 @@
 {% extends "base.html" %}
-{% block title %}{{pilseta["name"]}}{% endblock %}
+{% block title %}{{pilseta["nosaukums"]}}{% endblock %}
 {% block content %}
-  <h1>Pilsētas</h1>
-  <div>
-    <p>id: {{pilseta["id"]}}</p>
-    <p>nosaukums: {{pilseta["nosaukums"]}}</p>
-    <p>iedzivotaji: {{pilseta["iedzivotaji"]}}</p>
-    <p>platiba: {{pilseta["platiba"]}}</p>
-    <a href="/pilsetas/{{pilseta['id']}}/objekti">Apskates objekti</a>
-    <a href="/pilsetas/{{pilseta['id']}}/dzest">Dzēst pilsētu</a>
+  <h1>{{pilseta["nosaukums"]}}</h1>
+  <div class="card">
+    <p><strong>Nosaukums:</strong> {{pilseta["nosaukums"]}}</p>
+    <p><strong>Iedzīvotāju skaits:</strong> {{pilseta["iedzivotaji"]}}</p>
+    <p><strong>Platība (km²):</strong> {{pilseta["platiba"]}}</p>
+    <div class="mt-3">
+      <a href="/pilsetas/{{pilseta['id']}}/objekti" class="btn btn-info">Apskates objekti</a>
+      <a href="/pilsetas/{{pilseta['id']}}/edit" class="btn btn-warning">Rediģēt</a>
+      <a href="/pilsetas/{{pilseta['id']}}/dzest" class="btn btn-danger">Dzēst pilsētu</a>
+      <a href="/pilsetas" class="btn btn-secondary">Atpakaļ</a>
+    </div>
   </div>
 {% endblock %}

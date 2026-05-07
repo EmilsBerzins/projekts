@@ -2,13 +2,19 @@
 {% block title %}Pilsētas{% endblock %}
 {% block content %}
   <h1>Pievienot Pilsētu</h1>
-  <form method=post action="/pilsetas">
-    <label for="nosaukums">Nosaukums: </label>
-    <input type="text" name="nosaukums">
-    <label for="iedzivotaji">Iedzīvotāju skaits: </label>
-    <input type="number" name="iedzivotaji">
-    <label for="platiba">Platība: </label>
-    <input type="number" name="platiba">
-    <input type="submit" value="Pievienot">
+  <form method="post" action="/pilsetas">
+    <div class="form-group">
+      <label for="nosaukums">Nosaukums: </label>
+      <input type="text" name="nosaukums" id="nosaukums" required>
+    </div>
+    <div class="form-group">
+      <label for="iedzivotaji">Iedzīvotāju skaits: </label>
+      <input type="number" name="iedzivotaji" id="iedzivotaji" required>
+    </div>
+    <div class="form-group">
+      <label for="platiba">Platība (km²): </label>
+      <input type="number" name="platiba " id="platiba" required>
+    </div>
+    <button type="submit" class="btn btn-success">Pievienot</button>
   </form>
 {% endblock %}

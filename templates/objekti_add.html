@@ -1,9 +1,13 @@
 {% extends "base.html" %}
-{% block title %}Pilsētas{% endblock %}
+{% block title %}Pievienot objektu{% endblock %}
 {% block content %}
-  <h1>Apskates Objekti</h1>
-<form action="/pilsetas/{{id}}/objekti" method=post enctype=multipart/form-data>
-    <input type="file" name="file">
-    <input type="submit" value="Upload">
+  <h1>Pievienot apskates objektu</h1>
+  <form action="/pilsetas/{{id}}/objekti" method="post" enctype="multipart/form-data">
+    <div class="form-group">
+      <label for="file">Objekta attēls: </label>
+      <input type="file" name="file" id="file" accept="image/*" required>
+    </div>
+    <button type="submit" class="btn btn-success">Augšupielādēt</button>
+    <a href="/pilsetas/{{id}}/objekti" class="btn">Atcelt</a>
   </form>
 {% endblock %}

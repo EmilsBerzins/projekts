@@ -2,12 +2,15 @@
 {% block title %}Pilsētas{% endblock %}
 {% block content %}
   <h1>Pilsētas</h1>
-  <div>
+  <div class="mb-4">
+    <a href="/pilsetas/create" class="btn btn-primary">Pievienot pilsētu</a>
+  </div>
+  <div class="grid">
     {% for pilseta in pilsetas %}
-        <a href="/pilsetas/{{pilseta['id']}}">
-            <p>{{pilseta["nosaukums"]}}</p>
-        </a>
+      <div class="card">
+        <h3>{{pilseta["nosaukums"]}}</h3>
+        <a href="/pilsetas/{{pilseta['id']}}" class="btn btn-primary btn-small">Apskatīt aprakstu</a>
+      </div>
     {% endfor %}
-    <a href="/pilsetas/create">Pievienot pilsētu</a>
   </div>
 {% endblock %}

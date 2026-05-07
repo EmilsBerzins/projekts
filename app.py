@@ -62,6 +62,35 @@ def pilseta(id):
     return render_template("pilsetas_show.html", pilseta=pilseta)
 
 
+@app.route("/pilsetas/<int:id>/edit", methods=["GET", "POST"])
+def edit_pilseta(id):
+    conn = get_db_connection()
+    if request.method == "POST":
+        cursor = conn.cursor()
+        pilseta = cursor.execute(
+            "SELECT statistika_id FROM pilsetas WHERE id = ?",
+            (id,),
+        ).fetchone()
+        cursor.execute(
+            "UPDATE pilsetas SET nosaukums = ? WHERE id = ?",
+            (request.form["nosaukums"], id),
+        )
+        cursor.execute(
+            "UPDATE statistika SET iedzivotaji = ?, platiba = ? WHERE id = ?",
+            (request.form["iedzivotaji"], request.form["platiba"], pilseta["statistika_id"]),
+        )
+        conn.commit()
+        conn.close()
+        return redirect(f"/pilsetas/{id}")
+    
+    pilseta = conn.execute(
+        "SELECT pilsetas.id, nosaukums, iedzivotaji, platiba FROM pilsetas JOIN statistika ON pilsetas.statistika_id = statistika.id WHERE pilsetas.id = ?",
+        (id,),
+    ).fetchone()
+    conn.close()
+    return render_template("pilsetas_edit.html", pilseta=pilseta)
+
+
 @app.route("/pilsetas/<int:id>/dzest")
 def dzest_pilsetu(id):
     conn = get_db_connection()
@@ -129,3 +158,6 @@ def apskates_objekti(id):
 @app.route("/pilsetas/<int:id>/objekti/add")
 def pievienot_objektu(id):
     return render_template("objekti_add.html", id=id)
+
+if __name__ == "__main__":
+    app.run(debug=True)
