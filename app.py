@@ -164,32 +164,38 @@ def komentari():
     conn = get_db_connection()
     
     if request.method == "POST":
-        autors = request.form.get("autors", "Anonīms").strip() or "Anonīms"
+        autors = request.form.get("autors", "Anonims").strip() or "Anonims"
         teksts = request.form.get("teksts", "").strip()
         kategorija = request.form.get("kategorija", "vispareji")
-        pilseta = request.form.get("pilseta", "").strip()
+        pilseta_id = request.form.get("pilseta_id") or None
         
         if teksts:
             from datetime import datetime
             conn.execute(
-                "INSERT INTO komentari (autors, teksts, kategorija, pilseta, datums) VALUES (?, ?, ?, ?, ?)",
-                (autors, teksts, kategorija, pilseta, datetime.now().strftime("%Y-%m-%d %H:%M"))
+                "INSERT INTO komentari (autors, teksts, kategorija, pilseta_id, datums) VALUES (?, ?, ?, ?, ?)",
+                (autors, teksts, kategorija, pilseta_id, datetime.now().strftime("%Y-%m-%d %H:%M"))
             )
             conn.commit()
     
     kategorija_filter = request.args.get("kategorija", "visi")
     
     if kategorija_filter == "visi":
-        komentari = conn.execute(
-            "SELECT * FROM komentari ORDER BY id DESC"
-        ).fetchall()
+        komentari = conn.execute("""
+            SELECT komentari.*, pilsetas.nosaukums as pilsetas_nosaukums
+            FROM komentari
+            LEFT JOIN pilsetas ON komentari.pilseta_id = pilsetas.id
+            ORDER BY komentari.id DESC
+        """).fetchall()
     else:
-        komentari = conn.execute(
-            "SELECT * FROM komentari WHERE kategorija = ? ORDER BY id DESC",
-            (kategorija_filter,)
-        ).fetchall()
+        komentari = conn.execute("""
+            SELECT komentari.*, pilsetas.nosaukums as pilsetas_nosaukums
+            FROM komentari
+            LEFT JOIN pilsetas ON komentari.pilseta_id = pilsetas.id
+            WHERE komentari.kategorija = ?
+            ORDER BY komentari.id DESC
+        """, (kategorija_filter,)).fetchall()
     
-    pilsetas = conn.execute("SELECT nosaukums FROM pilsetas ORDER BY nosaukums").fetchall()
+    pilsetas = conn.execute("SELECT id, nosaukums FROM pilsetas ORDER BY nosaukums").fetchall()
     conn.close()
     return render_template("komentari.html", komentari=komentari, pilsetas=pilsetas, aktiva_kategorija=kategorija_filter)
  
@@ -218,4 +224,4 @@ def dzest_objektu(pilsetas_id, objekta_id):
     return redirect(f"/pilsetas/{pilsetas_id}/objekti")
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=False)

@@ -28,11 +28,11 @@
       </div>
 
       <div class="form-group">
-        <label for="pilseta">Pilsēta (neobligāti)</label>
-        <select id="pilseta" name="pilseta">
+        <label for="pilseta_id">Pilsēta (neobligāti)</label>
+        <select id="pilseta_id" name="pilseta_id">
           <option value="">— Nav norādīta —</option>
           {% for p in pilsetas %}
-            <option value="{{ p['nosaukums'] }}">{{ p['nosaukums'] }}</option>
+            <option value="{{ p['id'] }}">{{ p['nosaukums'] }}</option>
           {% endfor %}
         </select>
       </div>
@@ -65,8 +65,8 @@
         <div class="comment-header">
           <div class="comment-meta">
             <span class="comment-author">{{ k['autors'] }}</span>
-            {% if k['pilseta'] %}
-              <span class="comment-city">{{ k['pilseta'] }}</span>
+            {% if k['pilsetas_nosaukums'] %}
+              <span class="comment-city">{{ k['pilsetas_nosaukums'] }}</span>
             {% endif %}
             <span class="comment-badge badge-{{ k['kategorija'] }}">
               {% if k['kategorija'] == 'ieteikums' %}Ieteikums
